@@ -1,13 +1,5 @@
 # tests.ps1
 
-# Read the properties file
-$properties = Get-Content -Path "test.properties" | ConvertFrom-StringData
-
-# Export the variables to the environment
-foreach ($key in $properties.Keys) {
-    [Environment]::SetEnvironmentVariable($key, $properties[$key], "Process")
-}
-
 # Pester test cases
 Describe "Application Tests" {
     It "Application name should be correct" {

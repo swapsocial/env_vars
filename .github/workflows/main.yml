@@ -13,21 +13,23 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Read properties file and set environment variables
-      shell: pwsh
-      run: |
-        # Read the properties file and set environment variables
-        $properties = Get-Content -Path "test.properties" | ConvertFrom-StringData
-        foreach ($key in $properties.Keys) {
-          $value = $properties[$key]
-          Write-Output "Setting environment variable: $key=$value"
-          [Environment]::SetEnvironmentVariable($key, $value, "Process")
-        }
+      - name: Load Environment Variables from File
+        run: |
+          # Assuming you have a file called 'env_variables.txt'
+          Get-Content './test.properties' | ForEach-Object {
+            $split = $_.Split('=')
+            if ($split.Length -eq 2) {
+              [System.Environment]::SetEnvironmentVariable($split[0], $split[1], [System.EnvironmentVariableTarget]::Process)
+            }
+          }
 
-    - name: Run Pester tests
-      shell: pwsh
-      run: |
-        Invoke-Pester -Path ./tests.ps1 -Output Detailed
+      - name: Install Pester
+        run: Install-Module -Name Pester -Force -SkipPublisherCheck
+
+      - name: Run Pester Tests
+        run: |
+          # Now you can access the environment variables in your Pester test cases
+          Invoke-Pester -Script ./tests.ps1

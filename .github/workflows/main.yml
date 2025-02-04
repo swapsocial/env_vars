@@ -16,9 +16,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up PowerShell
-      uses: actions/setup-powershell@v3  # Corrected action reference
-
     - name: Read properties file and set environment variables
       shell: pwsh
       run: |

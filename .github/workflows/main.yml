@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
@@ -20,17 +20,17 @@ jobs:
       uses: actions/setup-powershell@v3
 
     - name: Read properties file and set environment variables
-      id: properties
+      shell: pwsh
       run: |
         # Read the properties file and set environment variables
-        while IFS= read -r line; do
-          if [[ $line != \#* && $line == *=* ]]; then
-            key=$(echo $line | cut -d '=' -f 1)
-            value=$(echo $line | cut -d '=' -f 2-)
-            echo "$key=$value" >> $GITHUB_ENV
-          fi
-        done < test.properties
+        $properties = Get-Content -Path "test.properties" | ConvertFrom-StringData
+        foreach ($key in $properties.Keys) {
+          $value = $properties[$key]
+          Write-Output "Setting environment variable: $key=$value"
+          [Environment]::SetEnvironmentVariable($key, $value, "Process")
+        }
 
     - name: Run Pester tests
+      shell: pwsh
       run: |
-        pwsh -Command "Invoke-Pester -Path ./tests.ps1"
+        Invoke-Pester -Path ./tests.ps1 -Output Detailed

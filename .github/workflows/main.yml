@@ -1,0 +1,36 @@
+name: Run Pester Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up PowerShell
+      uses: actions/setup-powershell@v3
+
+    - name: Read properties file and set environment variables
+      id: properties
+      run: |
+        # Read the properties file and set environment variables
+        while IFS= read -r line; do
+          if [[ $line != \#* && $line == *=* ]]; then
+            key=$(echo $line | cut -d '=' -f 1)
+            value=$(echo $line | cut -d '=' -f 2-)
+            echo "$key=$value" >> $GITHUB_ENV
+          fi
+        done < test.properties
+
+    - name: Run Pester tests
+      run: |
+        pwsh -Command "Invoke-Pester -Path ./tests.ps1"

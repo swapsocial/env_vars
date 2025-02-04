@@ -1,4 +1,7 @@
 # tests.ps1
+$env:APP_NAME
+$env:APP_VERSION
+$env:DATABASE_CONNECTION_STRING
 
 # Pester test cases
 Describe "Application Tests" {

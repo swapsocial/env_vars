@@ -22,7 +22,8 @@ jobs:
           Get-Content './test.properties' | ForEach-Object {
             $split = $_.Split('=')
             if ($split.Length -eq 2) {
-              [System.Environment]::SetEnvironmentVariable($split[0], $split[1], [System.EnvironmentVariableTarget]::Process)
+              # Write the variable to the GITHUB_ENV file
+              echo "$($split[0])=$($split[1])" >> $env:GITHUB_ENV
             }
           }
 
